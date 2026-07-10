@@ -26,6 +26,7 @@ md-editor/
 | トピック | 概要 |
 |---------|------|
 | [server](server.md) | ローカル HTTP サーバのルーティング・Content-Type・安全性・ライフサイクル |
+| [ci](ci.md) | CI（GitHub Actions）・auto-merge・main 保護 ruleset の運用 |
 
 ## 全体の流れ
 
