@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Viewer</title>
+
+  <!-- highlight.js テーマ（配色モードで切り替え。ダーク時に濃い文字が暗背景へ同化するのを防ぐ） -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #24292f;
+      --border: #d0d7de;
+      --muted: #57606a;
+      --accent: #0969da;
+      --code-bg: #f6f8fa;
+      --drop-bg: rgba(9, 105, 218, 0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+        --border: #30363d;
+        --muted: #8b949e;
+        --accent: #2f81f7;
+        --code-bg: #161b22;
+        --drop-bg: rgba(47, 129, 247, 0.1);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+                   "Noto Sans JP", Meiryo, sans-serif;
+      line-height: 1.7;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      font-size: 15px;
+      margin: 0;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    header .spacer { flex: 1; }
+    header label.btn, header button {
+      font: inherit;
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--code-bg);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    header label.btn:hover, header button:hover { border-color: var(--accent); }
+    header .filename { font-size: 13px; color: var(--muted); }
+    #fileInput { display: none; }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 120px;
+    }
+
+    /* 空状態 / ドロップゾーン */
+    #dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 50vh;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 40px;
+    }
+    #dropzone strong { color: var(--fg); font-size: 18px; }
+    body.dragover #dropzone { border-color: var(--accent); background: var(--drop-bg); }
+
+    /* Markdown 本文 */
+    #content h1, #content h2 { border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    #content h1 { font-size: 2em; }
+    #content h2 { font-size: 1.5em; }
+    #content code {
+      background: var(--code-bg);
+      padding: .2em .4em;
+      border-radius: 6px;
+      font-size: 85%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    #content pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      overflow: auto;
+    }
+    #content pre code { background: none; padding: 0; font-size: 100%; }
+    #content blockquote {
+      margin: 0;
+      padding: 0 1em;
+      color: var(--muted);
+      border-left: .25em solid var(--border);
+    }
+    #content table { border-collapse: collapse; display: block; overflow: auto; }
+    #content table th, #content table td {
+      border: 1px solid var(--border);
+      padding: 6px 13px;
+    }
+    #content table tr:nth-child(2n) { background: var(--code-bg); }
+    #content img { max-width: 100%; }
+    #content a { color: var(--accent); }
+    #content .mermaid {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      overflow: auto;
+    }
+    #content .mermaid-error {
+      background: var(--code-bg);
+      border: 1px solid #f85149;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #f85149;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- MDVIEW_INJECT -->
+</head>
+<body>
+  <header>
+    <h1>📝 Markdown Viewer</h1>
+    <span class="filename" id="filename"></span>
+    <span class="spacer"></span>
+    <label class="btn" for="fileInput">ファイルを開く</label>
+    <input type="file" id="fileInput" accept=".md,.markdown,.txt,text/markdown,text/plain">
+  </header>
+
+  <main>
+    <div id="dropzone">
+      <strong>Markdown ファイルをここにドロップ</strong>
+      <span>または右上の「ファイルを開く」から選択</span>
+      <span>（.md / .markdown / .txt に対応。mermaid のコードブロックは図として描画されます）</span>
+    </div>
+    <article id="content" style="display:none"></article>
+  </main>
+
+  <!-- ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.esm.min.mjs";
+
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    mermaid.initialize({ startOnLoad: false, theme: isDark ? "dark" : "default", securityLevel: "loose" });
+
+    const contentEl = document.getElementById("content");
+    const dropzoneEl = document.getElementById("dropzone");
+    const filenameEl = document.getElementById("filename");
+    const fileInput = document.getElementById("fileInput");
+
+    // marked のカスタムレンダラー: mermaid コードブロックは <pre class="mermaid"> に、
+    // それ以外は highlight.js でハイライト
+    const renderer = new marked.Renderer();
+    renderer.code = (code, lang) => {
+      if (lang === "mermaid") {
+        // HTML エスケープして mermaid 用の要素に入れる（描画は後で mermaid.run が行う）
+        const escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return `<pre class="mermaid">${escaped}</pre>`;
+      }
+      const valid = lang && window.hljs.getLanguage(lang);
+      const highlighted = valid
+        ? window.hljs.highlight(code, { language: lang }).value
+        : window.hljs.highlightAuto(code).value;
+      return `<pre><code class="hljs language-${lang || ""}">${highlighted}</code></pre>`;
+    };
+    marked.setOptions({ renderer, gfm: true, breaks: false });
+
+    async function render(markdownText, name) {
+      contentEl.innerHTML = marked.parse(markdownText);
+      dropzoneEl.style.display = "none";
+      contentEl.style.display = "block";
+      filenameEl.textContent = name || "";
+      // mermaid 図を描画
+      const blocks = contentEl.querySelectorAll("pre.mermaid");
+      if (blocks.length) {
+        try {
+          await mermaid.run({ nodes: blocks });
+        } catch (e) {
+          console.error("[mermaid] render failed", e);
+        }
+      }
+    }
+
+    function openFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => render(String(e.target.result), file.name);
+      reader.onerror = () => console.error("[file] read failed", reader.error);
+      reader.readAsText(file);
+    }
+
+    fileInput.addEventListener("change", (e) => openFile(e.target.files[0]));
+
+    // ドラッグ&ドロップ
+    ["dragenter", "dragover"].forEach((ev) =>
+      document.addEventListener(ev, (e) => { e.preventDefault(); document.body.classList.add("dragover"); })
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      document.addEventListener(ev, (e) => {
+        e.preventDefault();
+        if (ev === "drop" || e.target === document.documentElement || e.relatedTarget === null)
+          document.body.classList.remove("dragover");
+      })
+    );
+    document.addEventListener("drop", (e) => {
+      e.preventDefault();
+      document.body.classList.remove("dragover");
+      openFile(e.dataTransfer.files[0]);
+    });
+
+    // CLI から md が注入されていればそれを、なければサンプルを表示する
+    const __injected = typeof window.__MARKDOWN__ === "string";
+    render(__injected ? window.__MARKDOWN__ : `# Markdown Viewer へようこそ
+
+これは **mermaid にも対応した** 簡易マークダウンビューアです。
+右上の「ファイルを開く」か、ここに \`.md\` ファイルをドロップしてください。
+
+## コードのハイライト
+
+\`\`\`js
+const greet = (name) => \`Hello, \${name}!\`;
+console.log(greet("world"));
+\`\`\`
+
+## mermaid の図
+
+\`\`\`mermaid
+flowchart LR
+  A[Markdown] --> B{mermaid?}
+  B -- yes --> C[図として描画]
+  B -- no --> D[テキストとして表示]
+\`\`\`
+
+## 表
+
+| 機能 | 対応 |
+|------|:----:|
+| 見出し・表・引用 | ✅ |
+| コードハイライト | ✅ |
+| mermaid 描画 | ✅ |
+`, __injected ? (window.__FILENAME__ || "") : "");
+  </script>
+</body>
+</html>
