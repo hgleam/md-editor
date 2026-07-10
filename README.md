@@ -1,5 +1,8 @@
 # md-editor / mdview
 
+[![CI](https://github.com/hgleam/md-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/hgleam/md-editor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
+
 指定した Markdown ファイルを既定ブラウザで表示する簡易ビューア。**mermaid のコードブロックは図として描画**されます。**フォルダをローカル HTTP サーバで公開する**ため、`.md` 同士の相対リンクや画像を辿って回遊できます。
 
 ## 使い方
@@ -58,3 +61,7 @@ npm test
 
 - mermaid / highlight.js / marked を **CDN から読み込む**ため、表示時にネット接続が必要です。
   完全オフライン化する場合はライブラリをローカル同梱に変更してください。
+
+## ライセンス
+
+[MIT](LICENSE) © hgleam
