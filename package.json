@@ -1,0 +1,16 @@
+{
+  "name": "md-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "指定した Markdown ファイルを既定ブラウザで表示する簡易ビューア（mermaid 対応）",
+  "bin": {
+    "mdview": "bin/mdview.mjs"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
+  }
+}

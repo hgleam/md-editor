@@ -1,0 +1,5 @@
+node_modules/
+.husky/_/
+*.log
+.DS_Store
+screenshots/
