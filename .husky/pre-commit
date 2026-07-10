@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Block direct commits to main/master
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "⚠  main/master への直接コミットは禁止です。ブランチを切ってください。"
+  exit 1
+fi
+
+# Check spec freshness
+bash scripts/check-spec-freshness.sh
