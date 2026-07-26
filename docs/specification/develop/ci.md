@@ -17,7 +17,10 @@ GitHub Actions で PR をゲートし、緑になってからマージする運�
 
 - Node.js 20（`actions/setup-node`、npm キャッシュ）
 - `fetch-depth: 0`（genesis 監査に全履歴が必要）
-- ステップ: genesis 監査 → `npm ci` → `npm test`（Vitest 25 件）
+- ステップ: genesis 監査 → **Doc integrity** → `npm ci` → `npm test`（Vitest 25 件）
+- `Doc integrity` は Python の標準ライブラリのみで動くため **`npm ci` より前**に置く
+  （install が失敗しても文書のズレは検出できる）。中身は
+  [develop/README.md](README.md)「ドキュメント整合」を参照
 
 ## 運用
 

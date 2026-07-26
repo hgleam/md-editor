@@ -17,6 +17,17 @@ jobs:
           fetch-depth: 0 # genesis 監査に全履歴が必要
       - name: genesis audit # main は初回READMEのみ（太い初回コミット/複数ルートを検出）
         run: bash scripts/check-main-genesis.sh
+      # ドキュメント整合（構成ツリー・文書の数値・再掲）。Python の標準ライブラリのみで
+      # 動くので npm install より前に置く（install が失敗しても文書のズレは検出できる）。
+      # Node プロジェクトだが検査対象は Markdown で言語非依存のため、雛形を移植せず
+      # そのまま使う（雛形: ~/claude-private/.claude/skills/init/templates/）。
+      - name: Doc integrity
+        run: |
+          for t in tests/test_doc_tree.py tests/test_doc_facts.py tests/test_doc_dedup.py; do
+            echo "--- $t"
+            python3 "$t" || exit 1
+          done
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
