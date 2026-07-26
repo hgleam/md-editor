@@ -10,16 +10,11 @@
 
 ## ディレクトリ構成
 
-```
-md-editor/
-├── index.html            # 描画テンプレート（marked + mermaid + highlight.js、テーマ CSS）
-├── bin/mdview.mjs        # CLI 本体（ローカルサーバ起動 → 既定ブラウザで開く）
-├── src/server.mjs        # ローカル HTTP サーバ（md レンダリング配信＋生アセット配信＋403/404）
-├── src/inject.mjs        # md 本文を index.html に安全注入するロジック
-├── tests/server.test.mjs # server のテスト（Vitest）
-├── tests/inject.test.mjs # inject のテスト（Vitest）
-└── sample.md             # 動作確認用サンプル
-```
+リポジトリ全体の構成図の正本は**ルート [README.md](../../../README.md)**、`docs/` 配下は
+[docs/README.md](../../README.md)。ここでは重複を持たない（同じ事実を2箇所に置くと
+静かにドリフトするため。`tests/test_doc_tree.py` が複製を検出する）。
+
+各モジュールの責務は下記「全体の流れ」を参照。
 
 ## トピック
 
@@ -41,6 +36,24 @@ md-editor/
 - `tests/inject.test.mjs`（4 件）: 注入・エスケープ・復元。
 - `tests/server.test.mjs`（14 件）: Content-Type / isMarkdown / パス解決（トラバーサル・%デコード）／統合（.md レンダリング・生アセット・`/`・404・403）。
 - `tests/spec-freshness.test.mjs`: 仕様書鮮度チェックの仕組みが揃っているかの構造テスト。
+
+### ドキュメント整合（2026-07-27 追加）
+
+コードを直して**文書だけ古い**状態は、Vitest が緑でも起こる。実際、このリポジトリの構成図は
+`scripts/` `docs/` `tests/spec-freshness.test.mjs` が載っていない状態だった。機械照合する。
+
+- `tests/test_doc_tree.py` — 構成ツリー ↔ 実ファイルを**双方向**照合（漏れ／幽霊）。ツリーの
+  正本は2箇所で担当範囲が重ならない（全体＝ルート `README.md` / `docs/` 配下＝`docs/README.md`）。
+  このファイルにあったツリーは重複のためリンクへ変更した。
+- `tests/test_doc_facts.py` — `MDVIEW_IDLE_MIN` の既定（`bin/mdview.mjs`）と文書の記載を照合。
+  アイドル終了は「知らないうちにサーバが落ちる/落ちない」の体感に直結するため。
+- `tests/test_doc_dedup.py` — 文書間の再掲（本文で40文字以上の同一行が2文書にあれば FAIL。
+  出典行は対象外）。
+
+**Node プロジェクトだが Python で書いてある**: 検査対象は Markdown で言語非依存であり、
+雛形（`~/claude-private/.claude/skills/init/templates/`）を各プロジェクトへ**そのまま配れる**
+利点を取った。移植すると雛形の修正が各リポジトリへ届かなくなる。実行は `python3 <file>` 直、
+または `.husky/pre-commit` と CI の `Doc integrity` から。
 
 ## 設計判断
 
