@@ -94,9 +94,8 @@ def listed(tree: str, path: str) -> bool:
     各トークンを `/` で分割したセグメント集合との完全一致で判定する（部分文字列
     一致を避けつつ、ネストの深さが行ごとに違っても取りこぼさない）。
     """
-    segments = set()
-    for t in tokens(tree):
-        segments.update(t.rstrip("/").split("/"))
+    segments = {seg for t in tokens(tree)
+                for seg in t.rstrip("/").split("/") if seg}
     name = os.path.basename(path)
     if name != "README.md":
         return name in segments
