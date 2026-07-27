@@ -81,14 +81,29 @@ def in_repo(token: str) -> bool:
 
 
 def listed(tree: str, path: str) -> bool:
-    """ツリーに載っているか（README.md は同名が複数あるので親名も要求する）。"""
+    """ツリーに載っているか（README.md は同名が複数あるので親名も要求する）。
+
+    素の部分文字列一致（`name in tree`）だと、消した行を別の行が肩代わりして
+    素通りする。実例（agent-office）では `deploy.ts` の行をツリーから消しても、
+    同じディレクトリの `auto-deploy.ts` が `"deploy.ts"` を含むため検査が通って
+    しまった。判定はツリー全文に対する `in` なので、他のファイル名だけでなく
+    行末コメントに同じ語があっても同様に素通りする。
+
+    ツリーは行ごとに深さの異なるパス断片（`.github/workflows/ci.yml` のような
+    フルパス1行と、`tests/` の下に基底名だけを並べる1行の両方）が混在するため、
+    各トークンを `/` で分割したセグメント集合との完全一致で判定する（部分文字列
+    一致を避けつつ、ネストの深さが行ごとに違っても取りこぼさない）。
+    """
+    segments = set()
+    for t in tokens(tree):
+        segments.update(t.rstrip("/").split("/"))
     name = os.path.basename(path)
     if name != "README.md":
-        return name in tree
+        return name in segments
     parent = os.path.basename(os.path.dirname(path))
     if parent in ("", "docs"):
-        return "README.md" in tree
-    return parent in tree and "README.md" in tree
+        return "README.md" in segments
+    return parent in segments and "README.md" in segments
 
 
 repo_tree = tree_text(REPO_TREE_DOC)
