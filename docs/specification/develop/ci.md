@@ -1,7 +1,5 @@
 # CI ＋ auto-merge
 
-最終更新: 2026-07-10
-
 GitHub Actions で PR をゲートし、緑になってからマージする運用。
 
 ## 構成

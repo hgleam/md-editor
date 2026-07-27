@@ -23,7 +23,7 @@ jobs:
       # そのまま使う（雛形: ~/claude-private/.claude/skills/init/templates/）。
       - name: Doc integrity
         run: |
-          for t in tests/test_doc_tree.py tests/test_doc_facts.py tests/test_doc_dedup.py; do
+          for t in tests/test_doc_tree.py tests/test_doc_facts.py tests/test_doc_dedup.py tests/test_spec_no_history.py; do
             echo "--- $t"
             python3 "$t" || exit 1
           done
