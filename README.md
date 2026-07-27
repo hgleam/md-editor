@@ -30,34 +30,21 @@ node bin/mdview.mjs path/to/file.md
 
 ## ディレクトリ構成
 
-リポジトリ全体の構成図の正本はここ（`docs/` 配下の構成図は [docs/README.md](docs/README.md)）。
-
 ```
 .
-├── package.json                    # 依存・npm scripts（entry: mdview）
-├── index.html                      # 描画テンプレート（marked + mermaid + highlight.js）
-├── sample.md                       # 動作確認用サンプル
-├── bin/mdview.mjs                  # CLI 本体（サーバ起動＋ブラウザで開く・アイドル終了）
-├── src/
-│   ├── inject.mjs                  # md 本文を HTML へ安全注入
-│   └── server.mjs                  # ローカル HTTP サーバ（描画配信＋生アセット配信）
-├── tests/
-│   ├── inject.test.mjs             # inject のテスト（Vitest）
-│   ├── server.test.mjs             # server のテスト（Vitest）
-│   ├── spec-freshness.test.mjs     # 仕様書ゲートの構造テスト
-│   ├── test_doc_tree.py            # 構成ツリーと実ファイルの整合（双方向・2ツリー）
-│   ├── test_doc_facts.py           # 文書の数値がコード実値と一致するか
-│   └── test_doc_dedup.py           # 文書間の再掲（同一文の重複）検出
-├── scripts/
-│   ├── check-spec-freshness.sh     # 仕様書の鮮度チェック（pre-commit から呼ぶ）
-│   ├── check-main-genesis.sh       # main の履歴ルート監査（CI から呼ぶ）
-│   └── automerge.sh                # auto-merge の ON/OFF トグル
-├── .github/workflows/ci.yml        # CI（main の必須チェック）
-├── .husky/pre-commit               # 仕様書の鮮度＋ドキュメント整合の検査
-├── .claude/rules/
-│   └── specification-update.md     # 仕様書更新の義務（このリポジトリ限定ルール）
 ├── LICENSE                         # MIT
-└── docs/                           # 仕様書 / 設計メモ（構成図は docs/README.md）
+├── README.md
+├── index.html                      # 描画テンプレート（marked + mermaid + highlight.js）
+├── package.json                    # 依存・npm scripts（entry: mdview）
+├── sample.md                       # 動作確認用サンプル
+├── .claude/
+├── .github/
+├── .husky/
+├── bin/
+├── docs/                           # 仕様書 / 設計メモ（構成図は docs/README.md）
+├── scripts/
+├── src/
+└── tests/
 ```
 
 ## テスト

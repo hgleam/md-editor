@@ -1,8 +1,15 @@
 # md-editor / mdview — 仕様書
 
-最終更新: 2026-07-10
-
 指定した Markdown ファイルを既定ブラウザで表示する簡易ビューア。フォルダをローカル HTTP サーバで公開し、`.md` 同士の相対リンクや画像を辿って回遊できる（mermaid 対応）。
 
 - [依頼者向け仕様書](client/README.md) — 何ができるか・使い方・受け入れ基準
 - [開発者向け仕様書](develop/README.md) — 構成・サーバ挙動・テスト・設計判断
+
+## ディレクトリ構成
+
+```
+specification/
+├── README.md
+├── client/
+└── develop/
+```

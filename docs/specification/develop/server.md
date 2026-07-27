@@ -1,7 +1,5 @@
 # server — ローカル HTTP サーバ
 
-最終更新: 2026-07-10
-
 `src/server.mjs`。表示対象 md の親ディレクトリ（`rootDir`）をルートに公開する読み取り専用 HTTP サーバ。`bin/mdview.mjs` が `127.0.0.1` の空きポートで起動する。
 
 ## 公開 API
