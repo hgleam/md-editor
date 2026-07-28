@@ -35,3 +35,20 @@ gh pr merge <N> --auto --squash    # CI 緑になったら自動マージする�
 ## 未導入（任意）
 
 - 完全自動化（PR open で auto-merge を自動予約する `auto-merge.yml` ＋ マージ済みブランチを掃除する schedule ワークフロー）は未導入。大量 PR・改善ループ運用が必要になったら `ci-automerge` スキル §5 で追加する。
+
+## 自動マージ
+
+PR を作るだけで「CI 緑 → 自動マージ → ブランチ削除」まで無人で進む。
+
+| ワークフロー | 役割 |
+|---|---|
+| `.github/workflows/auto-merge.yml` | PR の open / reopen / ready_for_review で auto-merge を予約（draft は除外） |
+| `.github/workflows/cleanup-merged-branches.yml` | マージ済みブランチを毎日 00:00 JST に削除 |
+
+前提として、リポジトリ設定の `allow_auto_merge` と main 保護 ruleset の
+`required_status_checks`（CI のジョブ名）を有効にしてある。**必須チェックが無いと
+`--auto` は待つ対象が無く即マージになる**ため、両方揃って初めて「緑を待つ」動作になる。
+
+掃除を別ワークフローに分けているのは、`GITHUB_TOKEN` 起点のマージが
+`push` / `pull_request closed` を発火せず、`--delete-branch` も
+`delete_branch_on_merge` も効かないため（schedule はこの制約を受けない）。
